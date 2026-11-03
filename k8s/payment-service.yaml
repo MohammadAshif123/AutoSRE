@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: payment-service
+  namespace: autosre-demo
+spec:
+  replicas: 1
+  selector:
+    matchLabels: {app: payment-service}
+  template:
+    metadata:
+      labels: {app: payment-service}
+    spec:
+      containers:
+      - name: payment
+        image: python:3.11-slim
+        command: ["python","-c","from http.server import HTTPServer,SimpleHTTPRequestHandler; HTTPServer(('0.0.0.0',8000),SimpleHTTPRequestHandler).serve_forever()"]
+        ports: [{containerPort: 8000}]
+        resources:
+          requests: {cpu: "50m", memory: "64Mi"}
+          limits: {cpu: "250m", memory: "256Mi"}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: payment-service
+  namespace: autosre-demo
+spec:
+  selector: {app: payment-service}
+  ports: [{port: 8000, targetPort: 8000}]

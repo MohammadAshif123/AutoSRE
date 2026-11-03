@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata: {name: database, namespace: autosre-demo}
+spec:
+  replicas: 1
+  selector: {matchLabels: {app: database}}
+  template:
+    metadata: {labels: {app: database}}
+    spec:
+      containers:
+      - name: database
+        image: python:3.11-slim
+        command: ["python","-c","import time; print('Demo database ready'); time.sleep(1000000)"]
+        resources:
+          requests: {cpu: "30m", memory: "32Mi"}
+          limits: {cpu: "150m", memory: "128Mi"}
+---
+apiVersion: v1
+kind: Service
+metadata: {name: database, namespace: autosre-demo}
+spec:
+  selector: {app: database}
+  ports: [{port: 5432, targetPort: 5432}]
